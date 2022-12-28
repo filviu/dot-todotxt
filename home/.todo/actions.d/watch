@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Get action
+action=$1
+shift
+
+# Get command
+cmd=$@
+
+function usage() {
+    echo "  $(basename $0) [COMMAND]"
+    echo "    Clear terminal and repeat a todo command whenever the todo.txt"
+    echo "    file changes."
+    echo ""
+    echo "    Usage"
+    echo "      \$ todo.sh $(basename $0) [COMMAND]"
+    echo ""
+    echo "    Examples"
+    echo "      \$ todo.sh $(basename $0) ls +project"
+    echo "      \$ todo.sh $(basename $0) lsp @contect"
+    echo ""
+    exit
+}
+
+function watch() {
+    echo \"watch ${cmd}\"
+    ls "$TODO_FILE" | entr -cns "echo \"watch ${cmd}\" ; echo \"--\" ; ${TODO_FULL_SH} ${cmd}"
+    exit
+}
+
+[ "$action" = "usage" ] && usage
+[ "$action" = "watch" ] && watch
