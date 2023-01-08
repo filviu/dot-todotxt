@@ -1,6 +1,8 @@
 ## Install
 
-`homeshick clone git@github.com:filviu/dot-todotxt.git`
+```bash
+homeshick clone git@github.com:filviu/dot-todotxt.git
+```
 
 ## Dependencies
 
@@ -21,6 +23,9 @@ recur | recuring task tracking done | https://github.com/silviuvulcan/todo.txt-r
 todosh_plugins | recur and agenda not really used | https://github.com/sercxanto/todosh_plugins
 watch | live watch | https://github.com/munkee/todo.txt-watch
 
+```bash
+sudo apt install ruby entr perl libdatetime-perl libdatetime-format-duration-perl
+```
 
 ## process-later-dues.sh
 
