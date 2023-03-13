@@ -19,7 +19,7 @@ Tool | Usage | URL
 birdseye | bridseye overview | https://github.com/karbassi/todotxt-birdseye.git
 due | manipulate due dates | https://github.com/mdzimmerman/todo.txt-cli-due
 later | later recuring tasks | https://github.com/opennomad/todo.txt-later
-recur | recuring task tracking done | https://github.com/silviuvulcan/todo.txt-recurring-tasks
+recur | recuring task tracking done | https://github.com/filviu/todo.txt-recurring-tasks
 todosh_plugins | recur and agenda not really used | https://github.com/sercxanto/todosh_plugins
 watch | live watch | https://github.com/munkee/todo.txt-watch
 
