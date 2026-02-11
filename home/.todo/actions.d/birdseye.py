@@ -72,33 +72,33 @@ def printTaskGroups(title, taskDict, priorityList, percentages):
         for item in items:
             if item[0] in priorityList:
                 if item[0] not in percentages:
-                    printTaskGroup(item, -1, "*")
+                    printTaskGroup(item[0], (0,0,0,-1), "*")
                 else:
-                    printTaskGroup(item, percentages[item[0]], "*")
+                    printTaskGroup(item[0], percentages[item[0]], "*")
 
         for item in items:
             if item[0] not in priorityList:
                 if item[0] not in percentages:
-                    printTaskGroup(item, -1, " ")
+                    printTaskGroup(item[0], (0,0,0,-1), " ")
                 else:
-                    printTaskGroup(item, percentages[item[0]], " ")
+                    printTaskGroup(item[0], percentages[item[0]], " ")
 
-def printTaskGroup(p, pctage, star):
-    if pctage > -1:
+def printTaskGroup(dim, pctage, star):
+    if pctage[3] > -1:
         progressBar = ""
-        numStars = int(pctage//10)
+        numStars = int(pctage[3]//10)
         progressBar = "=" * numStars
         numSpaces = 10 - numStars
         for n in range(numSpaces):
             progressBar += " "
 
-        if pctage > 9:
-            displayTotal = " %d%%"% (pctage, );
+        if pctage[3] > 9:
+            displayTotal = " %d%%"% (pctage[3], );
         else:
-            displayTotal = "  %d%%"% (pctage, );
-        print("%s %s [%s] %s (%d todos)"% (star, displayTotal, progressBar,  p[0], p[1],))
+            displayTotal = "  %d%%"% (pctage[3], );
+        print("%s %s [%s] %s (%d/%d todos)"% (star, displayTotal, progressBar,  dim, pctage[1], pctage[2],))
     else:
-        print("%s %s (%d todos)"% (star, p[0], p[1], ))
+        print("%s %s (%d/%d todos)"% (star, dim, pctage[1], pctage[2],))
 
 def separator(c):
     sep = ""
@@ -113,83 +113,92 @@ def main(argv):
         sys.exit(2)
 
     # process todo.txt
-    try:
-        f = open (argv[0], "r")
-        projects = {}
-        contexts = {}
-        projectPriority = []
-        contextPriority = []
-        for line in f:
-            prioritized = False
-            words = line.split()
-            if words and words[0].startswith("("):
-                prioritized = True
-            for word in words:
-                if word[0:2] == "p:" or word[0:2] == "p-" or word[0:1] == "+":
-                    if word not in projects:
-                        projects[word] = 1
-                    else:
-                        projects[word] = projects.setdefault(word,0)  + 1
-                    if prioritized:
-                        projectPriority.append(word)
-                if word[0:1] == "@":
-                    if word not in contexts:
-                        contexts[word] = 1
-                    else:
-                        contexts[word] = contexts.setdefault(word, 0)  + 1
-                    if prioritized:
-                        contextPriority.append(word)
-        f.close()
-    except IOError:
-        print("ERROR:  The file named %s could not be read."% (argv[0], ))
-        usage()
-        sys.exit(2)
-
-    # process done.txt
-    try:
-        completedTasks = {}
-        f = open (argv[1], "r")
-        for line in f:
-            words = line.split()
-            for word in words:
-                if word[0:2] == "p:" or word[0:2] == "p-" or word[0:1] == "+":
-                    if word not in completedTasks:
-                        completedTasks[word] = 1
-                    else:
-                        completedTasks[word] = completedTasks.setdefault(word, 0) + 1
-        f.close()
-    except IOError:
-        print("ERROR:  The file named %s could not be read."% (argv[1], ))
-        usage()
-        sys.exit(2)
+    projects = {}
+    contexts = {}
+    projectPriority = []
+    contextPriority = []
+    completedTasks = {}
+    for fn in [argv[0], argv[1]]:
+        try:
+            f = open (fn)
+            for line in f:
+                prioritized = False
+                completed = False
+                words = line.split()
+                if words and words[0].startswith("("):
+                    prioritized = True
+                if words and words[0] == "x":
+                    completed = True
+                normalCount = 1 if not completed else 0
+                completedCount = 0 if not completed else 1
+                for word in words:
+                    if word[0:2] == "p:" or word[0:2] == "p-" or word[0:1] == "+":
+                        if word not in projects:
+                            projects[word] = normalCount
+                        else:
+                            projects[word] = projects.setdefault(word,0)  + normalCount
+                        if prioritized:
+                            projectPriority.append(word)
+                        if completed:
+                            if word not in completedTasks:
+                                completedTasks[word] = completedCount
+                            else:
+                                completedTasks[word] = completedTasks.setdefault(word, 0) + completedCount
+                    if word[0:1] == "@":
+                        if word not in contexts:
+                            contexts[word] = normalCount
+                        else:
+                            contexts[word] = contexts.setdefault(word, 0)  + normalCount
+                        if prioritized:
+                            contextPriority.append(word)
+                        if completed:
+                            if word not in completedTasks:
+                                completedTasks[word] = completedCount
+                            else:
+                                completedTasks[word] = completedTasks.setdefault(word, 0) + completedCount
+            f.close()
+        except IOError:
+            print("ERROR:  The file named %s could not be read."% (argv[0], ))
+            usage()
+            sys.exit(2)
 
     # calculate percentages
     projectPercentages = {}
-    for project in projects:
-        openTasks = projects[project]
+    projectsWithNoIncompletes = {}
+    contextsWithNoIncompletes = {}
+    src1 = [(k, v, True) for k,v in projects.items()]
+    src2 = [(k, v, False) for k,v in contexts.items()]
+    for it in (src1 + src2):
+        project = it[0]
+        openTasks = it[1]
+        isProject = it[2]
         if project in completedTasks:
             closedTasks = completedTasks[project]
         else:
             closedTasks = 0
         totalTasks = openTasks + closedTasks
-        projectPercentages[project] = (closedTasks*100) / totalTasks
+        percentage = (closedTasks*100) / totalTasks
+        projectPercentages[project] = (openTasks, closedTasks, totalTasks, percentage)
+        if openTasks == 0:
+            if isProject:
+                projects.pop(project, None)
+                projectsWithNoIncompletes[project] = (0,0,0,0)
+            else:
+                contexts.pop(project, None)
+                contextsWithNoIncompletes[project] = (0,0,0,0)
 
-    # get projects all done
-    projectsWithNoIncompletes = {}
-    for task in completedTasks:
-        if task not in projects:
-            projectsWithNoIncompletes[task] = 0
 
-    # print out useful info
+
     #print "TODO.TXT Bird's Eye View Report %s"% ( datetime.date.today().isoformat(), )
     print("")
     print("TODO.TXT Bird's Eye View Report")
 
     separator("=")
 
-    printTaskGroups("Projects with Open TODOs", projects, projectPriority, projectPercentages)
-    printTaskGroups("Contexts with Open TODOs", contexts, contextPriority, projectPercentages)
+    printTaskGroups("Projects with Open TODOs (done/total)", projects, projectPriority, projectPercentages)
+    printTaskGroups("Contexts with Open TODOs (done/total)", contexts, contextPriority, projectPercentages)
     printTaskGroups("Completed Projects (No open TODOs)", projectsWithNoIncompletes, projectPriority, projectPercentages)
+    printTaskGroups("Fulfilled Contexts (No open TODOs)", contextsWithNoIncompletes, projectPriority, projectPercentages)
     print("")
     print("* Projects and contexts with an asterisk next to them denote prioritized tasks.")
     print("Project with prioritized tasks are listed first, then sorted by number of open todos.")

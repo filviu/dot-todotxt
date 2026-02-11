@@ -12,5 +12,5 @@ shift
 }
 
 [ "$action" = "birdseye" ] && {
-     python $(dirname $0)/birdseye.py "$TODO_FILE" "$DONE_FILE"
+     python3 $(dirname $0)/birdseye.py "$TODO_FILE" "$DONE_FILE"
 }
