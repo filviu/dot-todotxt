@@ -2,7 +2,24 @@
 
 ```bash
 homeshick clone git@github.com:filviu/dot-todotxt.git
+sudo apt install ruby entr perl libdatetime-perl libdatetime-format-duration-perl
 ```
+
+### Recuring tasks
+
+Clone https://github.com/strawp/todo.txt-recurring-tasks.git somewhere.
+
+```bash
+sudo apt install libdatetime-perl
+sudo apt install libdatetime-format-duration-perl
+cd todo.txt-recurring-tasks
+perl Makefile.PL
+make
+# make test 
+sudo make install
+```
+
+> Note: tests are failing on new distros and I know even less perl than 4 years ago so won't be fixed soon.
 
 ## Dependencies
 
@@ -23,9 +40,6 @@ recur | recuring task tracking done | https://github.com/filviu/todo.txt-recurri
 todosh_plugins | recur and agenda not really used | https://github.com/sercxanto/todosh_plugins
 watch | live watch | https://github.com/munkee/todo.txt-watch
 
-```bash
-sudo apt install ruby entr perl libdatetime-perl libdatetime-format-duration-perl
-```
 
 ## process-later-dues.sh
 
@@ -35,8 +49,8 @@ the proper formated date allowing later to have working due dates.
 Obviously only works if ran the same day as todo.sh later. Easy to run 
 from the same cron entry, as below.
 
-Also if you run later the same day you get the task again (because
-the tomorrow/NNth is different than the already replaced date)
+Side-effect is than now you can only run later once per day otherwise you get 
+the task again (because the tomorrow/NNth is different than the already replaced date)
 
 ## Cron
 
