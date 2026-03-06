@@ -7,7 +7,7 @@ sudo apt install ruby entr perl libdatetime-perl libdatetime-format-duration-per
 
 ### Recuring tasks
 
-Clone https://github.com/strawp/todo.txt-recurring-tasks.git somewhere.
+Clone https://github.com/filviu/todo.txt-recurring-tasks.git somewhere.
 
 ```bash
 sudo apt install libdatetime-perl libdatetime-format-duration-perl build-essential
