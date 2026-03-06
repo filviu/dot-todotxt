@@ -10,8 +10,7 @@ sudo apt install ruby entr perl libdatetime-perl libdatetime-format-duration-per
 Clone https://github.com/strawp/todo.txt-recurring-tasks.git somewhere.
 
 ```bash
-sudo apt install libdatetime-perl
-sudo apt install libdatetime-format-duration-perl
+sudo apt install libdatetime-perl libdatetime-format-duration-perl build-essential
 cd todo.txt-recurring-tasks
 perl Makefile.PL
 make
